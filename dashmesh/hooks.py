@@ -11,6 +11,21 @@ app_color = "blue"
 app_email = "roshna@craftinteractive.ae"
 app_license = "MIT"
 
+fixtures = [
+	{
+	"dt":
+	"Custom Field",
+	"filters": [
+			[
+				"name", "in",
+				[
+					'Item-alcohol','Packing Slip Item-country_of_origin','Packing Slip Item-alcohol'
+				]
+			]
+		]
+	}
+]
+
 # Includes in <head>
 # ------------------
 
