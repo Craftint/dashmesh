@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include dashmesh *.css
+recursive-include dashmesh *.csv
+recursive-include dashmesh *.html
+recursive-include dashmesh *.ico
+recursive-include dashmesh *.js
+recursive-include dashmesh *.json
+recursive-include dashmesh *.md
+recursive-include dashmesh *.png
+recursive-include dashmesh *.py
+recursive-include dashmesh *.svg
+recursive-include dashmesh *.txt
+recursive-exclude dashmesh *.pyc
