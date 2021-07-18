@@ -1,0 +1,328 @@
+{
+ "autoname": "GTN.#####",
+ "creation": "2021-07-18 15:03:42.291320",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "invoice_section",
+  "posting_date",
+  "invoiced_by",
+  "supplier_invoice_number",
+  "batch_number",
+  "column_break_6",
+  "company",
+  "invoiced_to",
+  "supplier_name",
+  "currency_and_price_list_section",
+  "currency",
+  "exchange_rate",
+  "column_break_13",
+  "data_14",
+  "buying_price_list",
+  "price_list_currency",
+  "plc_conversion_rate",
+  "ignore_pricing_rule",
+  "section_break_19",
+  "items",
+  "total_qty",
+  "total",
+  "shipment_information_section_section",
+  "pol",
+  "pod",
+  "shipping_line",
+  "vesselvehicle",
+  "cntr_no",
+  "bl_date",
+  "column_break_30",
+  "git_status",
+  "eta",
+  "etd",
+  "no_of_days_expected_to_deliver",
+  "total_delayed",
+  "bl_no",
+  "section_break_37",
+  "history",
+  "section_break_39",
+  "status",
+  "remarks",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "invoice_section",
+   "fieldtype": "Section Break",
+   "label": "Invoice"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Goods In Transit Note",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "invoiced_by",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Invoiced By",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "supplier_invoice_number",
+   "fieldtype": "Data",
+   "label": "Supplier Invoice Number"
+  },
+  {
+   "fieldname": "batch_number",
+   "fieldtype": "Data",
+   "label": "Batch Number"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "invoiced_to",
+   "fieldtype": "Link",
+   "label": "Invoiced To",
+   "options": "Company"
+  },
+  {
+   "fetch_from": "invoiced_by.supplier_name",
+   "fieldname": "supplier_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Supplier Name"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "currency_and_price_list_section",
+   "fieldtype": "Section Break",
+   "label": "Currency and Price List"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "exchange_rate",
+   "fieldtype": "Float",
+   "label": "Exchange Rate",
+   "print_hide": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_13",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "data_14",
+   "fieldtype": "Data"
+  },
+  {
+   "fetch_from": "buying_price_list.currency",
+   "fieldname": "buying_price_list",
+   "fieldtype": "Link",
+   "label": "Price List",
+   "options": "Price List"
+  },
+  {
+   "depends_on": "buying_price_list",
+   "fieldname": "price_list_currency",
+   "fieldtype": "Link",
+   "label": "Price List Currency",
+   "options": "Currency",
+   "read_only": 1
+  },
+  {
+   "depends_on": "buying_price_list",
+   "fieldname": "plc_conversion_rate",
+   "fieldtype": "Float",
+   "label": "Price List Exchange Rate",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "ignore_pricing_rule",
+   "fieldtype": "Check",
+   "label": "Ignore Pricing Rule",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "section_break_19",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Goods In Transit Item"
+  },
+  {
+   "fieldname": "total_qty",
+   "fieldtype": "Float",
+   "label": "Total Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Currency",
+   "label": "Total",
+   "read_only": 1
+  },
+  {
+   "fieldname": "shipment_information_section_section",
+   "fieldtype": "Section Break",
+   "label": "Shipment Information"
+  },
+  {
+   "description": "Port Of Loading",
+   "fieldname": "pol",
+   "fieldtype": "Data",
+   "label": "POL"
+  },
+  {
+   "description": "Point Of Delivery",
+   "fieldname": "pod",
+   "fieldtype": "Data",
+   "label": "POD"
+  },
+  {
+   "fieldname": "shipping_line",
+   "fieldtype": "Data",
+   "label": "Shipping Line / Transport Co."
+  },
+  {
+   "fieldname": "vesselvehicle",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": " Vessel / Truck Name / No."
+  },
+  {
+   "fieldname": "cntr_no",
+   "fieldtype": "Data",
+   "label": "CNTR No"
+  },
+  {
+   "fieldname": "bl_date",
+   "fieldtype": "Date",
+   "label": "BL Date"
+  },
+  {
+   "fieldname": "column_break_30",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "git_status",
+   "fieldtype": "Select",
+   "label": "Git Status",
+   "options": "On Transit\nDelayed\nCompleted"
+  },
+  {
+   "allow_on_submit": 1,
+   "description": "Estimate Time of Arrival",
+   "fieldname": "eta",
+   "fieldtype": "Datetime",
+   "label": "ETA"
+  },
+  {
+   "allow_on_submit": 1,
+   "description": "Estimate Time of Departure",
+   "fieldname": "etd",
+   "fieldtype": "Datetime",
+   "label": "ETD"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "no_of_days_expected_to_deliver",
+   "fieldtype": "Data",
+   "label": "No of days expected to deliver",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "total_delayed",
+   "fieldtype": "Data",
+   "label": "Total days delayed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "bl_no",
+   "fieldtype": "Data",
+   "label": "BL No"
+  },
+  {
+   "fieldname": "section_break_37",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "history",
+   "fieldtype": "Table",
+   "label": "ETA/ETD History",
+   "options": "Goods In Transit History"
+  },
+  {
+   "fieldname": "section_break_39",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nWaiting to Receive Items\nPartially Received\nTo Receive\nCompleted\nCancelled",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  }
+ ],
+ "is_submittable": 1,
+ "modified": "2021-07-18 16:30:23.465016",
+ "modified_by": "Administrator",
+ "module": "Dashmesh",
+ "name": "Goods In Transit Note",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

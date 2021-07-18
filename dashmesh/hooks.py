@@ -19,7 +19,9 @@ fixtures = [
 			[
 				"name", "in",
 				[
-					'Item-alcohol','Packing Slip Item-country_of_origin','Packing Slip Item-alcohol'
+					'Item-alcohol','Packing Slip Item-country_of_origin','Packing Slip Item-alcohol',
+					'Purchase Order Item-git_qty','Purchase Receipt Item-transit_qty','Purchase Order Item-dispatched_qty',
+					'Purchase Order-goods_status','Purchase Receipt Item-goods_in_transit_note','Purchase Receipt Item-goods_in_transit_note_item'
 				]
 			]
 		]
@@ -41,7 +43,10 @@ fixtures = [
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+	"Purchase Order" : "public/js/purchase_order.js",
+    "Purchase Receipt" : "public/js/purchase_receipt.js",
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -94,13 +99,12 @@ fixtures = [
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-#	}
-# }
+doc_events = {
+	"Purchase Receipt": {
+		"on_submit": "dashmesh.events.purchase_receipt.update_goods_in_transit_note_items",
+        "on_cancel": "dashmesh.events.purchase_receipt.update_goods_in_transit_note_items_on_cancel",
+	},
+}
 
 # Scheduled Tasks
 # ---------------
