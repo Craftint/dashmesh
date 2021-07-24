@@ -47,7 +47,7 @@ frappe.ui.form.on('Sales Order', {
                 profit_total += doc.items[i].gross_profit
             }       
         }
-        if(profit_total>0){
+        if(profit_total != 0){
             net_profit_margin = (amount_total/profit_total)*100
         }
         frm.refresh_field('items');
