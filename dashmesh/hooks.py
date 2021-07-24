@@ -21,7 +21,8 @@ fixtures = [
 				[
 					'Item-alcohol','Packing Slip Item-country_of_origin','Packing Slip Item-alcohol',
 					'Purchase Order Item-git_qty','Purchase Receipt Item-transit_qty','Purchase Order Item-dispatched_qty',
-					'Purchase Order-goods_status','Purchase Receipt Item-goods_in_transit_note','Purchase Receipt Item-goods_in_transit_note_item'
+					'Purchase Order-goods_status','Purchase Receipt Item-goods_in_transit_note','Purchase Receipt Item-goods_in_transit_note_item',
+					'Sales Order Item-profit_margin','Sales Order-net_profit_margin'
 				]
 			]
 		]
@@ -46,6 +47,7 @@ fixtures = [
 doctype_js = {
 	"Purchase Order" : "public/js/purchase_order.js",
     "Purchase Receipt" : "public/js/purchase_receipt.js",
+    "Sales Order" : "public/js/sales_order.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -104,6 +106,9 @@ doc_events = {
 		"on_submit": "dashmesh.events.purchase_receipt.update_goods_in_transit_note_items",
         "on_cancel": "dashmesh.events.purchase_receipt.update_goods_in_transit_note_items_on_cancel",
 	},
+	"Sales Order": {
+		"validate": "dashmesh.events.sales_order.set_profit",
+	}
 }
 
 # Scheduled Tasks
