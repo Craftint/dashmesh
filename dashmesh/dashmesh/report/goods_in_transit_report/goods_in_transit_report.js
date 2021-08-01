@@ -25,16 +25,10 @@ frappe.query_reports["Goods In Transit Report"] = {
 			
 		},
 		{
-		'label': 'Item',
-		'fieldname': 'item',
+			'label': 'Item',
+			'fieldname': 'item',
 			'fieldtype': 'Link',
 			'options':'Item',
-			
-		},
-		{
-			'label': 'Item Origin',
-			'fieldname': 'item_origin',
-			'fieldtype': 'Data',
 			
 		},
 		{

@@ -46,7 +46,6 @@ frappe.query_reports["Reorder level report"] = {
 			"width": "80",
 			"options": "Warehouse",
 			get_query: () => {
-				var cost_center = frappe.query_report.get_filter_value('cost_center');
 				var company = frappe.query_report.get_filter_value('company');
 				if(company){
 					return {

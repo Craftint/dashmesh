@@ -108,6 +108,7 @@ doc_events = {
 	},
 	"Sales Order": {
 		"validate": "dashmesh.events.sales_order.set_profit",
+		"before_submit" : "dashmesh.events.sales_order.check_reservation"
 	}
 }
 
