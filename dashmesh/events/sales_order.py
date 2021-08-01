@@ -4,16 +4,16 @@ from frappe.utils import cint, flt, cstr, comma_or
 
 def set_profit(doc, handler=None):
 	for item in doc.items:
-		if item.gross_profit != 0:
-			item.profit_margin = flt((item.net_amount/item.gross_profit)*100)
+		if item.net_amount != 0:
+			item.profit_margin = flt((item.gross_profit/item.net_amount)*100)
 
 @frappe.whitelist()
 def get_profit(net=None,profit=None):
 	net_amount = flt(net)
 	gross_profit = flt(profit)
 	margin = 0.0
-	if gross_profit != 0:
-		margin = (net_amount/gross_profit)*100
+	if net_amount != 0:
+		margin = (gross_profit/net_amount)*100
 	return margin
 
 def check_reservation(doc,handler=None):
@@ -31,3 +31,4 @@ def check_reservation(doc,handler=None):
 					msg = _(f'Available quantity for item code {item.item_code} is only {available_qty}. Please choose quantity less than or equal to available quantity'),
 					title= 'Item not available',
 				)
+	frappe.msgprint("All quantities has been reserved!")

@@ -23,7 +23,7 @@
   "in_list_view": 1,
   "in_standard_filter": 0,
   "insert_after": "batch_no",
-  "label": "Alcohol",
+  "label": "Alcohol %",
   "length": 0,
   "modified": "2021-07-17 17:10:46.513550",
   "name": "Packing Slip Item-alcohol",
