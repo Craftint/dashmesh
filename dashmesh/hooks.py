@@ -22,7 +22,7 @@ fixtures = [
 					'Item-alcohol','Packing Slip Item-country_of_origin','Packing Slip Item-alcohol',
 					'Purchase Order Item-git_qty','Purchase Receipt Item-transit_qty','Purchase Order Item-dispatched_qty',
 					'Purchase Order-goods_status','Purchase Receipt Item-goods_in_transit_note','Purchase Receipt Item-goods_in_transit_note_item',
-					'Sales Order Item-profit_margin','Sales Order-net_profit_margin'
+					'Sales Order Item-profit_margin','Sales Order-net_profit_margin','Item-bottles_per_crate'
 				]
 			]
 		]
