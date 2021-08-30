@@ -1,6 +1,9 @@
 frappe.ui.form.on('Packing Slip Item', {
 	qty:function(frm,cdt,cdn){
-        frm.trigger('calculate_amount');
+        var d = locals[cdt][cdn]
+        if ((d.stock_uom == 'Case') ||d.stock_uom == 'Case(s)'){
+            frm.trigger('calculate_amount');
+        }
     },
 });
 
