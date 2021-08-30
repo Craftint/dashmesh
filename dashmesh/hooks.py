@@ -22,7 +22,8 @@ fixtures = [
 					'Item-alcohol','Packing Slip Item-country_of_origin','Packing Slip Item-alcohol',
 					'Purchase Order Item-git_qty','Purchase Receipt Item-transit_qty','Purchase Order Item-dispatched_qty',
 					'Purchase Order-goods_status','Purchase Receipt Item-goods_in_transit_note','Purchase Receipt Item-goods_in_transit_note_item',
-					'Sales Order Item-profit_margin','Sales Order-net_profit_margin','Item-bottles_per_crate'
+					'Sales Order Item-profit_margin','Sales Order-net_profit_margin','Item-bottles_per_crate','Item-volume',
+					'Packing Slip-total_volume','Packing Slip Item-volume'
 				]
 			]
 		]
@@ -47,7 +48,8 @@ fixtures = [
 doctype_js = {
 	"Purchase Order" : "public/js/purchase_order.js",
     "Purchase Receipt" : "public/js/purchase_receipt.js",
-    "Sales Order" : "public/js/sales_order.js"
+    "Sales Order" : "public/js/sales_order.js",
+    "Packing Slip":"public/js/packing_slip.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -109,6 +111,9 @@ doc_events = {
 	"Sales Order": {
 		"validate": "dashmesh.events.sales_order.set_profit",
 		"before_submit" : "dashmesh.events.sales_order.check_reservation"
+	},
+	"Packing Slip": {
+		"validate":"dashmesh.events.packing_slip.set_total_volume"
 	}
 }
 
