@@ -1,0 +1,152 @@
+.pagination_table {
+  display: inline-block;
+}
+
+.pagination_table a {
+  color: black;
+  float: left;
+  padding: 1px 9px;
+  text-decoration: none;
+  transition: background-color .3s;
+  border: 1px solid #ddd;
+  margin: 0 4px;
+}
+
+.pagination_table a.active {
+  background-color: #5e64ff;
+  color: white;
+  border: 1px solid #444bff;
+}
+
+.pagination_table a:hover:not(.active) {background-color: #ddd;}
+
+
+/* PAGINATION BETA CODE */
+
+@keyframes cdp-in {
+  from {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.cdp {
+  position: relative;
+  text-align: center;
+  font-size: 0;
+  z-index: 6;
+  text-decoration: none;
+  animation: cdp-in 500ms ease both;
+  animation-timeout: 200ms;
+
+  &_i {
+    font-size: 14px;
+    text-decoration: none;
+
+    transition: background 250ms;
+
+    display: inline-block;
+    text-transform: uppercase;
+    margin: 0 3px 6px;
+    height: 27px;
+    min-width: 26px;
+    border-radius: 38px;
+    border: 2px solid #000;
+    line-height: 23px;
+    padding: 0;
+    color: #000;
+    font-weight: 700;
+    letter-spacing: .03em;
+    display: none;
+
+    &:first-child,
+    &:last-child {
+      padding: 0 7px;
+      margin: 0 3px 0px;
+    }
+
+    &:last-child,
+    &:nth-child(2),
+    &:nth-last-child(2) {
+      display: inline-block;
+    }
+  }
+
+  &_i:hover {
+    background-color: #000;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  &:not([actpage="1"]) &_i:nth-child(1) {
+    display: inline-block;
+    text-decoration: none;
+  }
+}
+@for $i from 1 through 80 {
+  .cdp[actpage="#{$i}"] {
+    // 3 before
+    .cdp_i:nth-child(#{$i - 1}):not(:first-child):not(:nth-child(2)) {
+      display: inline-block;
+      pointer-events: none;
+      color: transparent;
+      border-color: transparent;
+      width: 40px;
+      text-align: center;
+      &:after {
+        content: '...';
+        color: #000;
+        font-size: 32px;
+        margin-left: -19px;
+      }
+    }
+    // 2 before
+    /*.cdp_i:nth-child(#{$i - 1}):not(:first-child) {
+      display: inline-block;
+      text-decoration: none;
+    }*/
+    // before
+    .cdp_i:nth-child(#{$i}):not(:first-child) {
+      display: inline-block;
+      text-decoration: none;
+    }
+    // active
+    .cdp_i:nth-child(#{$i+1}) {
+      background-color: #000;
+      color: #fff;
+      display: inline-block;
+      text-decoration: none;
+      +.cdp_i:last-child {
+        display: none !important;
+      }
+    }
+    // next
+    .cdp_i:nth-child(#{$i + 2}):not(:last-child) {
+      display: inline-block;
+      text-decoration: none;
+    }
+    // 2 next
+    /*.cdp_i:nth-child(#{$i + 3}):not(:last-child) {
+      display: inline-block;
+    }*/
+    // 3 next
+    .cdp_i:nth-child(#{$i + 3}):not(:last-child):not(:nth-last-child(2)) {
+      display: inline-block;
+      pointer-events: none;
+      color: transparent;
+      border-color: transparent;
+      width: 40px;
+      text-align:center;
+      &:after {
+        content: '...';
+        color: #000;
+        font-size: 32px;
+        margin-left: -19px;
+      }
+    }
+  }
+}

@@ -9,6 +9,7 @@ frappe.ui.form.on("Purchase Receipt", {
 			
         }
     },
+
     //Add custom function
 	get_items_from_goodsintransit: function (frm) {
 		if (!frm.doc.supplier){

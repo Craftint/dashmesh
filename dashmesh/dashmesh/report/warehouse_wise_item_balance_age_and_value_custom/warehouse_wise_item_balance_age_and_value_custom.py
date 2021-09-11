@@ -1,3 +1,4 @@
+
 # Copyright (c) 2013, Roshna and contributors
 # For license information, please see license.txt
 
@@ -61,8 +62,9 @@ def execute(filters=None):
 		total_qty = sum(bal_qty)
 		if len(warehouse_list) > 1:
 			row += [total_qty]
+			row += [total_stock_value/total_qty]
 		row += bal_qty
-
+		print("\n\nrowwwwwwww",row)
 		if total_qty > 0:
 			data.append(row)
 		elif not filters.get("filter_total_zero_qty"):
@@ -75,7 +77,7 @@ def get_columns(filters):
 
 	columns = [
 		_("Item")+":Link/Item:120",
-		_("Item Name")+"::150",
+		_("Item Name")+"::170",
 		_("Item Group")+"::110",
 		_("Value")+":Currency:100",
 		_("Age")+":Float:80",
@@ -110,7 +112,8 @@ def get_warehouse_list(filters):
 def add_warehouse_column(columns, warehouse_list):
 	if len(warehouse_list) > 1:
 		columns += [_("Total Qty")+":Int:100"]
+		columns += [_("Per case value")+":Int:110"]
 
 	for wh in warehouse_list:
-		columns += [_(wh.name)+":Int:100"]
+		columns += [_(wh.name)+":Int:140"]
 

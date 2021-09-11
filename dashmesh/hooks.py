@@ -23,7 +23,21 @@ fixtures = [
 					'Purchase Order Item-git_qty','Purchase Receipt Item-transit_qty','Purchase Order Item-dispatched_qty',
 					'Purchase Order-goods_status','Purchase Receipt Item-goods_in_transit_note','Purchase Receipt Item-goods_in_transit_note_item',
 					'Sales Order Item-profit_margin','Sales Order-net_profit_margin','Item-bottles_per_crate','Item-volume',
-					'Packing Slip-total_volume','Packing Slip Item-volume'
+					'Packing Slip-total_volume','Packing Slip Item-volume','Quotation Item-profit_margin','Quotation Item-gross_profit',
+					'Quotation-net_profit_margin','Purchase Receipt Item-batch_expiry','Purchase Receipt Item-batch_number',
+					'Quotation Item-gross_profit_based_on_last_purchase_rate','Sales Order Item-gross_profit_based_on_last_purchase_rate'
+				]
+			]
+		]
+	},
+	{
+		"dt":"Property Setter",
+		"filters": [
+			[
+				"name", "in", [
+					'Sales Order Item-delivery_date-in_list_view','Purchase Receipt Item-serial_no-in_list_view','Purchase Receipt Item-rate-columns',
+					'Purchase Receipt Item-warehouse-in_list_view','Purchase Receipt Item-net_amount-in_list_view','Purchase Receipt Item-net_amount-columns',
+					'Purchase Receipt Item-amount-columns','Purchase Receipt Item-base_rate-columns','Sales Order Item-gross_profit-label'
 				]
 			]
 		]
@@ -34,7 +48,7 @@ fixtures = [
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/dashmesh/css/dashmesh.css"
+app_include_css = "/assets/css/dashmesh.min.css"
 # app_include_js = "/assets/dashmesh/js/dashmesh.js"
 
 # include js, css files in header of web template
@@ -49,7 +63,8 @@ doctype_js = {
 	"Purchase Order" : "public/js/purchase_order.js",
     "Purchase Receipt" : "public/js/purchase_receipt.js",
     "Sales Order" : "public/js/sales_order.js",
-    "Packing Slip":"public/js/packing_slip.js"
+    "Packing Slip":"public/js/packing_slip.js",
+    "Quotation" : "public/js/quotation.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -107,6 +122,7 @@ doc_events = {
 	"Purchase Receipt": {
 		"on_submit": "dashmesh.events.purchase_receipt.update_goods_in_transit_note_items",
         "on_cancel": "dashmesh.events.purchase_receipt.update_goods_in_transit_note_items_on_cancel",
+        "validate": "dashmesh.events.purchase_receipt.create_batch"
 	},
 	"Sales Order": {
 		"validate": "dashmesh.events.sales_order.set_profit",
@@ -114,6 +130,9 @@ doc_events = {
 	},
 	"Packing Slip": {
 		"validate":"dashmesh.events.packing_slip.set_total_volume"
+	},
+	"Quotation": {
+		"validate":"dashmesh.events.quotation.set_profit"
 	}
 }
 

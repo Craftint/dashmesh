@@ -1,0 +1,3 @@
+{
+  "css/dashmesh.min.css": ["public/css/sidebar.scss", "public/css/pagination.scss"]
+}
