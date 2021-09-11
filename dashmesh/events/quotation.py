@@ -20,6 +20,7 @@ def set_profit(doc, handler=None):
 @frappe.whitelist()
 def get_profit(item=None,wh=None,base_rate=0,stock_qty=0,net=None,profit=None):
 	last_purchase_rate = 0
+	gross_profit = profit
 	item_doc = frappe.get_doc("Item",item)
 	valuation_rate = frappe.db.sql("""
 			SELECT valuation_rate FROM `tabStock Ledger Entry` WHERE item_code = %s
