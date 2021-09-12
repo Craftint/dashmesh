@@ -36,4 +36,4 @@ def get_profit(item=None,wh=None,base_rate=0,stock_qty=0,net=None,profit=None):
 	margin = 0.0
 	if net_amount != 0:
 		margin = flt((gross_profit_purchase_rate/net_amount)*100)
-	return [margin,gross_profit,gross_profit_purchase_rate]
+	return [margin,gross_profit,gross_profit_purchase_rate,last_purchase_rate]

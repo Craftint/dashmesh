@@ -37,7 +37,12 @@ fixtures = [
 				"name", "in", [
 					'Sales Order Item-delivery_date-in_list_view','Purchase Receipt Item-serial_no-in_list_view','Purchase Receipt Item-rate-columns',
 					'Purchase Receipt Item-warehouse-in_list_view','Purchase Receipt Item-net_amount-in_list_view','Purchase Receipt Item-net_amount-columns',
-					'Purchase Receipt Item-amount-columns','Purchase Receipt Item-base_rate-columns','Sales Order Item-gross_profit-label'
+					'Purchase Receipt Item-amount-columns','Purchase Receipt Item-base_rate-columns','Sales Order Item-gross_profit-label','Purchase Receipt Item-uom-columns',
+					'Purchase Receipt Item-uom-in_list_view','Purchase Order Item-amount-columns','Purchase Order Item-uom-columns',
+					'Purchase Order Item-uom-in_list_view','Sales Invoice Item-uom-columns','Sales Invoice Item-uom-in_list_view','Sales Invoice Item-qty-columns',
+					'Sales Order Item-rate-columns','Sales Order Item-uom-columns','Sales Order Item-uom-in_list_view','Quotation Item-uom-columns','Quotation Item-rate-columns',
+					'Quotation Item-uom-in_list_view',''
+
 				]
 			]
 		]
