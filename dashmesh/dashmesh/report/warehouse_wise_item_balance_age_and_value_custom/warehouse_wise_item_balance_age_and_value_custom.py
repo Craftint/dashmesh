@@ -49,7 +49,7 @@ def execute(filters=None):
 		if not item_ageing.get(item):  continue
 
 		total_stock_value = sum(item_value[(item,item_name,item_group)])
-		row = [item,item_name,item_group,total_stock_value]
+		row = [item,item_name,item_group]
 
 		fifo_queue = item_ageing[item]["fifo_queue"]
 		average_age = 0.00
@@ -63,8 +63,9 @@ def execute(filters=None):
 		if len(warehouse_list) > 1:
 			row += [total_qty]
 			row += [total_stock_value/total_qty]
+			row += [total_stock_value]
+
 		row += bal_qty
-		print("\n\nrowwwwwwww",row)
 		if total_qty > 0:
 			data.append(row)
 		elif not filters.get("filter_total_zero_qty"):
@@ -79,7 +80,7 @@ def get_columns(filters):
 		_("Item")+":Link/Item:120",
 		_("Item Name")+"::170",
 		_("Item Group")+"::110",
-		_("Value")+":Currency:100",
+		# _("Total Value")+"::110",
 		_("Age")+":Float:80",
 	]
 	return columns
@@ -112,7 +113,8 @@ def get_warehouse_list(filters):
 def add_warehouse_column(columns, warehouse_list):
 	if len(warehouse_list) > 1:
 		columns += [_("Total Qty")+":Int:100"]
-		columns += [_("Per case value")+":Int:110"]
+		columns += [_("Per case value")+":Float:110"]
+		columns += [_("Total Value")+":Float:110"]
 
 	for wh in warehouse_list:
 		columns += [_(wh.name)+":Int:140"]
