@@ -5,10 +5,9 @@ from frappe.utils import cint, flt, cstr, comma_or
 def set_profit(doc, handler=None):
 	for item in doc.items:
 		last_purchase_rate = 0
-		valuation_rate = frappe.db.sql("""
-				SELECT valuation_rate FROM `tabStock Ledger Entry` WHERE item_code = %s
-				AND warehouse = %s AND valuation_rate > 0
-				ORDER BY posting_date DESC, posting_time DESC, creation DESC LIMIT 1
+		valuation_rate = frappe.db.sql("""SELECT valuation_rate FROM `tabStock Ledger Entry` WHERE item_code = %s 
+			AND warehouse = %s AND valuation_rate > 0 
+			ORDER BY posting_date DESC, posting_time DESC, creation DESC LIMIT 1
 				""", (item.item_code, item.warehouse))
 		if valuation_rate:
 			item.gross_profit = flt(((item.base_rate - valuation_rate[0][0]) * item.stock_qty))
@@ -73,7 +72,6 @@ def check_reservation(doc,handler=None):
 	if validation_messages:
 		for msg in validation_messages:
 			msgprint(msg)
-
 		raise frappe.ValidationError(validation_messages)
 	frappe.msgprint("All quantities has been reserved!")
 

@@ -139,7 +139,10 @@ doc_events = {
 	},
 	"Quotation": {
 		"validate":"dashmesh.events.quotation.set_profit"
-	}
+	},
+	"Pick List": {
+        "before_save": "dashmesh.events.pick_list.set_warehouses",
+    },
 }
 
 # Scheduled Tasks
