@@ -1,5 +1,5 @@
 import frappe
-from frappe import _
+from frappe import msgprint,_
 from frappe.utils import cint, flt, cstr, comma_or
 
 def set_profit(doc, handler=None):
@@ -39,7 +39,12 @@ def get_profit(item=None,wh=None,base_rate=0,stock_qty=0,net=None,profit=None):
 	return [margin,gross_profit,gross_profit_purchase_rate,last_purchase_rate]
 
 def check_reservation(doc,handler=None):
-	for item in doc.items:
+	def _get_msg(row_num, msg):
+		return _("Row # {0}: ").format(row_num+1) + msg
+	validation_messages = []
+	for row_num,item in enumerate(doc.items):
+		# try:
+		available_qty = 0
 		db_exist = frappe.db.exists({
 					"doctype": "Bin",
 					"item_code": item.item_code,
@@ -49,10 +54,27 @@ def check_reservation(doc,handler=None):
 			item_bin = frappe.get_doc("Bin",db_exist[0][0])
 			available_qty = item_bin.actual_qty - item_bin.reserved_qty
 			if item.qty > available_qty:
-				frappe.throw(
-					msg = _(f'Available quantity for item code {item.item_code} is only {available_qty}. Please choose quantity less than or equal to available quantity'),
-					title= 'Item not available',
-				)
+				if available_qty > 0:
+					validation_messages.append(_get_msg(row_num, _("Available quantity for item code {0} is only {1}.Please choose quantity less than or equal to available quantity").format(item.item_code,available_qty)))
+				else:
+					validation_messages.append(_get_msg(row_num, _("Available quantity for item code {0} is 0.Please choose quantity less than or equal to available quantity").format(item.item_code,available_qty)))
+
+				# raise frappe.ValidationError(_("Available quantity for item code {0} is only {1}.Please choose quantity less than or equal to available quantity").format(item.item_code,available_qty))
+				# raise frappe.ValidationError(_(f'Available quantity for item code {item.item_code} is only {available_qty}. Please choose quantity less than or equal to available quantity'))
+				# frappe.throw(
+				# 	msg = _(f'Available quantity for item code {item.item_code} is only {available_qty}. Please choose quantity less than or equal to available quantity'),
+				# 	title= 'Item not available',
+				# )
+		else:
+			validation_messages.append(_get_msg(row_num, _("Available quantity for item code {0} is only {1}.Please choose quantity less than or equal to available quantity").format(item.item_code,available_qty)))
+
+		# except Exception as e:
+		# 	validation_messages.append(_cstr(e))
+	if validation_messages:
+		for msg in validation_messages:
+			msgprint(msg)
+
+		raise frappe.ValidationError(validation_messages)
 	frappe.msgprint("All quantities has been reserved!")
 
 @frappe.whitelist()
