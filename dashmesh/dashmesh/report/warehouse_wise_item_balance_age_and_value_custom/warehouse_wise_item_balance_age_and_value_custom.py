@@ -44,10 +44,39 @@ def execute(filters=None):
 		item_value.setdefault((item,item_map[item]["item_name"],item_map[item]["item_group"]),[])
 		item_value[(item,item_map[item]["item_name"],item_map[item]["item_group"])].append(total_stock_value)
 
+	item_filters = ""
+
+	if filters.get("item_code") is not None and filters.get("item_code") != "":
+			item_filters += """ and ti.item_code = '{item_code}' """.format(item_code=filters.get("item_code"))
+	if filters.get("item_group") is not None and filters.get("item_group") != "":
+		item_filters += """ and ti.item_group = '{item_group}' """.format(item_group=filters.get("item_group"))
+	if filters.get("warehouse") is not None and filters.get("warehouse") != "":
+		item_filters += """ and tb.warehouse = '{warehouse}' """.format(warehouse=filters.get("warehouse"))
+
+	bin_items = frappe.db.sql(""" select 
+										ti.item_code,
+										ti.item_name,
+										ti.item_group,
+										tb.warehouse,
+										tb.actual_qty,
+										tb.reserved_qty,
+										(tb.actual_qty - tb.reserved_qty) as available_qty,
+										tb.ordered_qty
+									from
+										`tabItem` ti
+									left join `tabBin` tb on
+										ti.item_code = tb.item_code
+									WHERE
+										tb.docstatus = 0 {item_filters}
+									""".format(item_filters=item_filters), as_dict=True)
+
+
 	# sum bal_qty by item
 	for (item,item_name,item_group), wh_balance in iteritems(item_balance):
 		if not item_ageing.get(item):  continue
 
+		reserv_qty = 0
+		avail_qty = 0
 		total_stock_value = sum(item_value[(item,item_name,item_group)])
 		row = [item,item_name,item_group]
 
@@ -57,6 +86,16 @@ def execute(filters=None):
 			average_age = get_average_age(fifo_queue, filters["to_date"])
 
 		row += [average_age]
+		item_doc = frappe.get_doc("Item",item)
+		row += [item_doc.bottles_per_crate]
+
+		# print(">",bin_items)
+		for r in bin_items:
+			if r.item_code == item_doc.item_code:
+				reserv_qty += r.reserved_qty
+				avail_qty += r.available_qty
+		row += [reserv_qty]
+		row += [avail_qty]
 
 		bal_qty = [sum(bal_qty) for bal_qty in zip(*wh_balance)]
 		total_qty = sum(bal_qty)
@@ -82,6 +121,9 @@ def get_columns(filters):
 		_("Item Group")+"::110",
 		# _("Total Value")+"::110",
 		_("Age")+":Float:80",
+		_("No of Bottles")+":Float:80",
+		_("Reserved Qty")+":Float:80",
+		_("Available Qty")+":Float:80",
 	]
 	return columns
 
