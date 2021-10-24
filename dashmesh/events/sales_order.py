@@ -73,7 +73,7 @@ def check_reservation(doc,handler=None):
 		for msg in validation_messages:
 			msgprint(msg)
 		# raise frappe.ValidationError(validation_messages)
-		frappe.msgprint(validation_messages)
+		# frappe.msgprint(validation_messages)
 	frappe.msgprint("All available quantities has been reserved!")
 
 @frappe.whitelist()
