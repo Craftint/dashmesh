@@ -13,8 +13,8 @@ def set_profit(doc, handler=None):
 			item.gross_profit = flt(((item.base_rate - valuation_rate[0][0]) * item.stock_qty))
 		last_purchase_rate = frappe.get_cached_value("Item", item.item_code, "last_purchase_rate")
 		item.gross_profit_based_on_last_purchase_rate = flt(((item.base_rate - last_purchase_rate) * item.stock_qty))
-		if item.net_amount != 0:
-			item.profit_margin = flt((item.gross_profit/item.net_amount)*100)
+		if item.base_net_amount != 0:
+			item.profit_margin = flt((item.gross_profit/item.base_net_amount)*100)
 
 @frappe.whitelist()
 def get_profit(item=None,wh=None,base_rate=0,stock_qty=0,net=None,profit=None):

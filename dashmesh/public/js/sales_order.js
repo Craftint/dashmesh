@@ -8,7 +8,7 @@ frappe.ui.form.on('Sales Order Item', {
 				wh : d.warehouse,
 				base_rate : d.base_rate,
 				stock_qty : d.stock_qty,
-				net : d.net_amount,
+				net : d.base_net_amount,
 				profit : d.gross_profit
 			},
 			callback: function(r) {
@@ -32,7 +32,7 @@ frappe.ui.form.on('Sales Order Item', {
 				wh : d.warehouse,
 				base_rate : d.base_rate,
 				stock_qty : d.stock_qty,
-				net : d.net_amount,
+				net : d.base_net_amount,
 				profit : d.gross_profit
 			},
 			callback: function(r) {
@@ -57,8 +57,8 @@ frappe.ui.form.on('Sales Order', {
 		let amount_total = 0;
 		let net_profit_margin = 0;
 		for (let i in doc.items){
-			if (doc.items[i].net_amount){
-				amount_total += doc.items[i].net_amount;
+			if (doc.items[i].base_net_amount){
+				amount_total += doc.items[i].base_net_amount;
 				profit_total += doc.items[i].gross_profit_based_on_last_purchase_rate
 			}       
 		}
