@@ -101,7 +101,10 @@ def execute(filters=None):
 		total_qty = sum(bal_qty)
 		if len(warehouse_list) > 1:
 			row += [total_qty]
-			row += [total_stock_value/total_qty]
+			if total_qty == 0:
+				row += [total_qty]
+			else:
+				row += [total_stock_value/total_qty]
 			row += [total_stock_value]
 
 		row += bal_qty
