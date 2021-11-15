@@ -37,7 +37,11 @@ def execute(filters=None):
 		item_balance.setdefault((item,item_map[item]["item_name"],item_map[item]["item_group"]), [])
 		total_stock_value = 0.00
 		for wh in warehouse_list:
+			res_qty = 0
 			row += [qty_dict.bal_qty] if wh.name in warehouse else [0.00]
+			if wh.name in warehouse:
+				res_qty = frappe.db.get_value('Bin',{'item_code': item, 'warehouse': wh.name}, 'reserved_qty')
+			row += [res_qty] if res_qty else [0.00]
 			total_stock_value += qty_dict.bal_val if wh.name in warehouse else 0.00
 
 		item_balance[(item,item_map[item]["item_name"],item_map[item]["item_group"])].append(row)
@@ -89,7 +93,6 @@ def execute(filters=None):
 		item_doc = frappe.get_doc("Item",item)
 		row += [item_doc.bottles_per_crate]
 
-		# print(">",bin_items)
 		for r in bin_items:
 			if r.item_code == item_doc.item_code:
 				reserv_qty += r.reserved_qty
@@ -163,4 +166,5 @@ def add_warehouse_column(columns, warehouse_list):
 
 	for wh in warehouse_list:
 		columns += [_(wh.name)+":Int:140"]
+		columns += [_(wh.name)+"\nReserved Qty"+":Int:200"]
 
