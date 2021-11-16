@@ -167,4 +167,3 @@ def add_warehouse_column(columns, warehouse_list):
 	for wh in warehouse_list:
 		columns += [_(wh.name)+":Int:140"]
 		columns += [_(wh.name)+"\nReserved Qty"+":Int:200"]
-
