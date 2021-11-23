@@ -29,6 +29,7 @@ def execute(filters=None):
 	item_balance = {}
 	item_value = {}
 
+
 	for (company, item, warehouse) in sorted(iwb_map):
 		if not item_map.get(item):  continue
 
@@ -38,10 +39,11 @@ def execute(filters=None):
 		total_stock_value = 0.00
 		for wh in warehouse_list:
 			res_qty = 0
-			row += [qty_dict.bal_qty] if wh.name in warehouse else [0.00]
-			if wh.name in warehouse:
-				res_qty = frappe.db.get_value('Bin',{'item_code': item, 'warehouse': wh.name}, 'reserved_qty')
-			row += [res_qty] if res_qty else [0.00]
+			row += [qty_dict.bal_qty] if wh.name == warehouse else [0.00]
+			res_qty = frappe.db.get_value('Bin',{'item_code': item, 'warehouse': wh.name}, 'reserved_qty')
+			if not res_qty:
+				res_qty = 0
+			row += [res_qty]
 			total_stock_value += qty_dict.bal_val if wh.name in warehouse else 0.00
 
 		item_balance[(item,item_map[item]["item_name"],item_map[item]["item_group"])].append(row)
@@ -100,10 +102,11 @@ def execute(filters=None):
 		row += [reserv_qty]
 		row += [avail_qty]
 
+
 		bal_qty = [sum(bal_qty) for bal_qty in zip(*wh_balance)]
 		total_qty = sum(bal_qty)
 		if len(warehouse_list) > 1:
-			row += [total_qty]
+			row += [total_qty-reserv_qty]
 			if total_qty == 0:
 				row += [total_qty]
 			else:
