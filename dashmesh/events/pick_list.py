@@ -37,4 +37,14 @@ def set_warehouses(doc, handler =None):
 					item.qty = so_item.qty
 					item.stock_qty = so_item.qty
 					item.picked_qty = so_item.qty
+	
+	for item in doc.locations:
+		if item.qty == 0:
+			doc.locations.remove(item)
+
+	sl_no = 1
+	for sl in doc.locations:
+		sl.idx = sl_no
+		sl_no+=1
+
 					
