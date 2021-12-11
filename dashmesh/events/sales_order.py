@@ -5,6 +5,7 @@ from frappe.utils import cint, flt, cstr, comma_or
 def set_profit(doc, handler=None):
 	for item in doc.items:
 		last_purchase_rate = 0
+		profit_total = amount_total = net_profit_margin = 0
 		valuation_rate = frappe.db.sql("""SELECT valuation_rate FROM `tabStock Ledger Entry` WHERE item_code = %s 
 			AND warehouse = %s AND valuation_rate > 0 
 			ORDER BY posting_date DESC, posting_time DESC, creation DESC LIMIT 1
@@ -15,6 +16,17 @@ def set_profit(doc, handler=None):
 		item.gross_profit_based_on_last_purchase_rate = flt(((item.base_rate - last_purchase_rate) * item.stock_qty))
 		if item.base_net_amount != 0:
 			item.profit_margin = flt((item.gross_profit/item.base_net_amount)*100)
+
+		amount_total += item.base_net_amount;
+		profit_total += item.gross_profit_based_on_last_purchase_rate
+
+	if profit_total != 0:
+		net_profit_margin = (amount_total/profit_total)*100
+
+	doc.net_profit_margin = net_profit_margin
+
+	frappe.db.set_value("Sales Order",doc.name,"net_profit_margin",net_profit_margin)
+   
 
 @frappe.whitelist()
 def get_profit(item=None,wh=None,base_rate=0,stock_qty=0,net=None,profit=None):
