@@ -12,11 +12,13 @@ frappe.ui.form.on('Quotation Item', {
                 profit : d.gross_profit
             },
             callback: function(r) {
+                console.log("r",r.message)
                 if(r.message){
                     frappe.model.set_value(cdt, cdn, "profit_margin", r.message[0])
                     frappe.model.set_value(cdt, cdn, "gross_profit", r.message[1])
                     frappe.model.set_value(cdt, cdn, "gross_profit_based_on_last_purchase_rate", r.message[2])
                     frappe.model.set_value(cdt, cdn, "last_purchase_rate", r.message[3])
+                    frappe.model.set_value(cdt, cdn, "valuation_rate", r.message[4])
                 }
             }
         })
@@ -37,10 +39,12 @@ frappe.ui.form.on('Quotation Item', {
             },
             callback: function(r) {
                 if(r.message){
+                    console.log("r",r.message)
                     frappe.model.set_value(cdt, cdn, "profit_margin", r.message[0])
                     frappe.model.set_value(cdt, cdn, "gross_profit", r.message[1])
                     frappe.model.set_value(cdt, cdn, "gross_profit_based_on_last_purchase_rate", r.message[2])
                     frappe.model.set_value(cdt, cdn, "last_purchase_rate", r.message[3])
+                    frappe.model.set_value(cdt, cdn, "valuation_rate", r.message[4])
                 }
             }
         })
