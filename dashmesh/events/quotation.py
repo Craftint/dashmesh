@@ -3,6 +3,7 @@ from frappe import _
 from frappe.utils import cint, flt, cstr, comma_or
 
 def set_profit(doc, handler=None):
+	t = margin = 0
 	for item in doc.items:
 		last_purchase_rate = 0
 		profit_total = amount_total = net_profit_margin = 0
@@ -14,6 +15,7 @@ def set_profit(doc, handler=None):
 		if valuation_rate:
 			item.valuation_rate = valuation_rate[0][0]
 			item.gross_profit = flt(((item.base_rate - valuation_rate[0][0]) * item.stock_qty))
+			t += (valuation_rate[0][0] * item.stock_qty)
 		last_purchase_rate = frappe.get_cached_value("Item", item.item_code, "last_purchase_rate")
 		item.gross_profit_based_on_last_purchase_rate = flt(((item.base_rate - last_purchase_rate) * item.stock_qty))
 		if item.base_net_amount != 0:
@@ -22,8 +24,11 @@ def set_profit(doc, handler=None):
 		amount_total += item.base_net_amount;
 		profit_total += item.gross_profit_based_on_last_purchase_rate
 
-	if profit_total != 0:
-		net_profit_margin = (amount_total/profit_total)*100
+	if doc.base_total != 0:
+		margin = (doc.base_total - t) 
+		net_profit_margin = (margin/doc.base_total)*100
+	# if profit_total != 0:
+	# 	net_profit_margin = (amount_total/profit_total)*100
 
 	doc.net_profit_margin = net_profit_margin
 

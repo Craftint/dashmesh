@@ -56,14 +56,19 @@ frappe.ui.form.on('Sales Order', {
 		let profit_total = 0;
 		let amount_total = 0;
 		let net_profit_margin = 0;
+		let t = 0;
+		let margin = 0;
 		for (let i in doc.items){
 			if (doc.items[i].base_net_amount){
 				amount_total += doc.items[i].base_net_amount;
 				profit_total += doc.items[i].gross_profit_based_on_last_purchase_rate
+				t += (doc.items[i].valuation_rate * doc.items[i].stock_qty)
 			}       
 		}
-		if(profit_total != 0){
-			net_profit_margin = (amount_total/profit_total)*100
+		if(doc.base_total != 0){
+			margin = (doc.base_total - t) 
+			net_profit_margin = (margin/doc.base_total)*100
+			// net_profit_margin = (amount_total/profit_total)*100
 		}
 		frm.refresh_field('items');
 		frm.set_value('net_profit_margin', net_profit_margin);
