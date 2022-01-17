@@ -26,7 +26,7 @@ fixtures = [
 					'Packing Slip-total_volume','Packing Slip Item-volume','Quotation Item-profit_margin','Quotation Item-gross_profit',
 					'Quotation-net_profit_margin','Purchase Receipt Item-batch_expiry','Purchase Receipt Item-batch_number',
 					'Quotation Item-gross_profit_based_on_last_purchase_rate','Sales Order Item-gross_profit_based_on_last_purchase_rate','Quotation Item-last_purchase_rate',
-					'Sales Order Item-last_purchase_rate'
+					'Sales Order Item-last_purchase_rate','Quotation-warehouse'
 				]
 			]
 		]
