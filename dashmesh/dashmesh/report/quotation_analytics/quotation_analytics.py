@@ -130,7 +130,7 @@ def get_warehouse_list(filters):
 
 def get_data(filters):
 	data = []
-	quot_items = frappe.db.get_list("Quotation Item", {"parent": filters.get("quot")},['item_code','item_name','qty','rate','valuation_rate'])
+	quot_items = frappe.db.get_list("Quotation Item", {"parent": filters.get("quot")},['item_code','item_name','qty','base_rate','valuation_rate'])
 	warehouse_list = get_warehouse_list(filters)
 
 	for item in quot_items:
@@ -161,16 +161,16 @@ def get_data(filters):
 			last_purchase_price = 0
 			last_purchase_date = ''
 
-		if item.rate != 0:
-			margin = round(flt((item.rate - item.valuation_rate)/item.rate),3)
+		if item.base_rate != 0:
+			margin = round(flt((item.base_rate - item.valuation_rate)/item.base_rate),3)
 		else:
-			margin = round((item.rate - item.valuation_rate),3)
+			margin = round((item.base_rate - item.valuation_rate),3)
 
 		row = {
 			"item_code":item.item_code,
 			"item_name":item.item_name,
 			"qty":item.qty,
-			"rate":item.rate,
+			"rate":item.base_rate,
 			"last_sold_price":last_sold_price,
 			"last_sold_date":last_sold_date,
 			"valuation_rate":item.valuation_rate,
