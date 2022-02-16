@@ -131,15 +131,16 @@ def get_warehouse_list(filters):
 def get_data(filters):
 	data = []
 	quot_items = frappe.db.get_list("Quotation Item", {"parent": filters.get("quot")},['item_code','item_name','qty','base_rate','valuation_rate'])
+	customer = frappe.db.get_value('Quotation',{'name':filters.get('quot')},'customer_name')
 	warehouse_list = get_warehouse_list(filters)
 
 	for item in quot_items:
 
 		last_sold = frappe.db.sql(
 			"""select base_rate,posting_date from `tabSales Invoice Item` sid inner join `tabSales Invoice` si 
-			on sid.parent= si.name where sid.item_code = '{}' and si.docstatus != 2 
+			on sid.parent= si.name where sid.item_code = '{}' and si.customer_name = '{}' and si.docstatus != 2
 			order by si.posting_date DESC""".format(
-				item.item_code),as_dict=1)
+				item.item_code, customer),as_dict=1)
 
 		if last_sold:
 			last_sold_price = last_sold[0]['base_rate']
