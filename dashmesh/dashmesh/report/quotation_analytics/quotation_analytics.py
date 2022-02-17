@@ -141,6 +141,10 @@ def get_data(filters):
 				AND warehouse = %s AND valuation_rate > 0
 				ORDER BY posting_date DESC, posting_time DESC, creation DESC LIMIT 1
 				""", (item.item_code, item.warehouse))
+		if not valuation_rate:
+			val_rate = [[0.00]]
+		else:
+			val_rate = valuation_rate
 
 		last_sold = frappe.db.sql(
 			"""select base_rate,posting_date from `tabSales Invoice Item` sid inner join `tabSales Invoice` si 
@@ -169,9 +173,9 @@ def get_data(filters):
 			last_purchase_date = ''
 
 		if item.base_rate != 0:
-			margin = round(flt(((item.base_rate - valuation_rate[0][0])/item.base_rate))*100,3)
+			margin = round(flt(((item.base_rate - val_rate[0][0])/item.base_rate))*100,3)
 		else:
-			margin = round((item.base_rate - item.valuation_rate[0][0]),3)
+			margin = round((item.base_rate - item.val_rate[0][0]),3)
 
 		row = {
 			"item_code":item.item_code,
@@ -180,7 +184,7 @@ def get_data(filters):
 			"rate":item.base_rate,
 			"last_sold_price":last_sold_price,
 			"last_sold_date":last_sold_date,
-			"valuation_rate":valuation_rate[0][0],
+			"valuation_rate":val_rate[0][0],
 			"last_purchase_price":last_purchase_price,
 			"last_purchase_date":last_purchase_date,
 			"margin_cost":flt(margin)
