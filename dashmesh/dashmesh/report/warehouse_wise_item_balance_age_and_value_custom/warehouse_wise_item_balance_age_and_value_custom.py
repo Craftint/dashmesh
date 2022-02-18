@@ -12,12 +12,8 @@ from erpnext.stock.report.stock_ageing.stock_ageing import get_fifo_queue, get_a
 from six import iteritems
 
 def execute(filters=None):
-	# if not filters: filters = {}
-	if not filters: filters = {
-		"item_code":'20092',
-		"from_date":'2022-02-02',
-		"to_date":'2022-02-02'
-	}
+	if not filters: filters = {}
+	
 	validate_filters(filters)
 
 	columns = get_columns(filters)
@@ -95,32 +91,23 @@ def execute(filters=None):
 		reserv = sum(list(map(float,[i[1] for i in bal_qty_split])))
 		avail = sum(list(map(float,[i[2] for i in bal_qty_split])))
 
-		print("\nactual reserv avail",actual,reserv,avail)
-
-		row += [reserv]
-		row += [avail]
-
 		total_qty = actual
 		if len(warehouse_list) > 1:
-			print("warehouse len >1")
+			row += [reserv]
+			row += [avail]
 			row += [actual]
-			# row += [800.00]
-			print("row",row)
 			if total_qty == 0:
-				row += [total_qty]
+				row += [actual]
 			else:
-				row += [total_stock_value/total_qty]
+				row += [total_stock_value/actual]
 			row += [total_stock_value]
-		print("rowwww\n",row)
 		row += bal_qty
 		if total_qty > 0:
 			data.append(row)
 		elif not filters.get("filter_total_zero_qty"):
 			data.append(row)
 
-	print("\ndataaaa",data)
 	add_warehouse_column(columns, warehouse_list)
-	print("\nfinaldataaaa",data)
 	return columns, data
 
 def get_columns(filters):
@@ -132,8 +119,6 @@ def get_columns(filters):
 		_("Item Group")+"::110",
 		_("Age")+":Float:80",
 		_("No of Bottles")+":Float:80",
-		_("Reserved Qty")+":Float:80",
-		_("Available Qty")+":Float:80",
 	]
 	return columns
 
@@ -164,6 +149,8 @@ def get_warehouse_list(filters):
 
 def add_warehouse_column(columns, warehouse_list):
 	if len(warehouse_list) > 1:
+		columns += [_("Reserved Qty")+":Float:100"]
+		columns += [_("Available Qty")+":Float:100"]
 		columns += [_("Total Qty")+":Float:100"]
 		columns += [_("Per case value")+":Float:110"]
 		columns += [_("Total Value")+":Float:110"]
