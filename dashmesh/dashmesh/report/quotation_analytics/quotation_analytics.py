@@ -130,16 +130,27 @@ def get_warehouse_list(filters):
 
 def get_data(filters):
 	data = []
-	quot_items = frappe.db.get_list("Quotation Item", {"parent": filters.get("quot")},['item_code','item_name','qty','base_rate','valuation_rate'])
+
+	quot_items = frappe.db.get_list("Quotation Item", {"parent": filters.get("quot")},['item_code','item_name','qty','base_rate','warehouse'])
+	customer = frappe.db.get_value('Quotation',{'name':filters.get('quot')},'customer_name')
 	warehouse_list = get_warehouse_list(filters)
 
 	for item in quot_items:
+		valuation_rate = frappe.db.sql("""
+				SELECT valuation_rate FROM `tabStock Ledger Entry` WHERE item_code = %s
+				AND warehouse = %s AND valuation_rate > 0
+				ORDER BY posting_date DESC, posting_time DESC, creation DESC LIMIT 1
+				""", (item.item_code, item.warehouse))
+		if not valuation_rate:
+			val_rate = [[0.00]]
+		else:
+			val_rate = valuation_rate
 
 		last_sold = frappe.db.sql(
 			"""select base_rate,posting_date from `tabSales Invoice Item` sid inner join `tabSales Invoice` si 
-			on sid.parent= si.name where sid.item_code = '{}' and si.docstatus != 2 
+			on sid.parent= si.name where sid.item_code = '{}' and si.customer_name = '{}' and si.docstatus != 2
 			order by si.posting_date DESC""".format(
-				item.item_code),as_dict=1)
+				item.item_code, customer),as_dict=1)
 
 		if last_sold:
 			last_sold_price = last_sold[0]['base_rate']
@@ -162,9 +173,9 @@ def get_data(filters):
 			last_purchase_date = ''
 
 		if item.base_rate != 0:
-			margin = round(flt((item.base_rate - item.valuation_rate)/item.base_rate),3)
+			margin = round(flt(((item.base_rate - val_rate[0][0])/item.base_rate))*100,3)
 		else:
-			margin = round((item.base_rate - item.valuation_rate),3)
+			margin = round((item.base_rate - val_rate[0][0]),3)
 
 		row = {
 			"item_code":item.item_code,
@@ -173,18 +184,28 @@ def get_data(filters):
 			"rate":item.base_rate,
 			"last_sold_price":last_sold_price,
 			"last_sold_date":last_sold_date,
-			"valuation_rate":item.valuation_rate,
+			"valuation_rate":val_rate[0][0],
 			"last_purchase_price":last_purchase_price,
 			"last_purchase_date":last_purchase_date,
-			"margin_cost":flt(margin*100)
+			"margin_cost":flt(margin)
 		}
 		
 		total_st = req_qt = 0
 
 		for wh in warehouse_list:
-			avail_qty = frappe.db.get_value('Bin',{'item_code': item.item_code, 'warehouse': wh.name}, 'actual_qty')
-			row[wh.name] = avail_qty if avail_qty else 0.00
-			total_st += avail_qty if avail_qty else 0.00
+			act_qty = frappe.db.get_value('Bin',{'item_code': item.item_code, 'warehouse': wh.name}, 'actual_qty')
+			res_qty = frappe.db.get_value('Bin',{'item_code': item.item_code, 'warehouse': wh.name}, 'reserved_qty')
+			if act_qty or res_qty:
+				avail_qty = act_qty - res_qty
+			else:
+				avail_qty = 0.00
+			
+			# avail_qty = frappe.db.get_value('Bin',{'item_code': item.item_code, 'warehouse': wh.name}, 'actual_qty')
+			# row[wh.name] = avail_qty if avail_qty else 0.00
+			# total_st += avail_qty if avail_qty else 0.00
+
+			row[wh.name] = avail_qty
+			total_st += avail_qty
 
 		req_qt = item.qty - total_st
 
