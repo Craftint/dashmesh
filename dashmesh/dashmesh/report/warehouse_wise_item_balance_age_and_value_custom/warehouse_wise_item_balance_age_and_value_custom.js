@@ -12,6 +12,7 @@ frappe.query_reports["Warehouse wise Item Balance Age and Value Custom"] = {
 	            "width": "80",
 	            "reqd": 1,
 	            "default": frappe.datetime.add_months(frappe.datetime.get_today(), -1),
+	            "hidden":1
 		    },
 		    {
 	            "fieldname":"to_date",
@@ -19,14 +20,15 @@ frappe.query_reports["Warehouse wise Item Balance Age and Value Custom"] = {
 	            "fieldtype": "Date",
 	            "width": "80",
 	            "reqd": 1,
-	            "default": frappe.datetime.get_today()
+	            "default": frappe.datetime.get_today(),
+	            "hidden":1
 		    },
 		    {
 	            "fieldname": "item_group",
 	            "label": __("Item Group"),
 	            "fieldtype": "Link",
 	            "width": "80",
-	            "options": "Item Group"
+	            "options": "Item Group",
 		    },
 		    {
 	            "fieldname": "item_code",

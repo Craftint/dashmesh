@@ -12,8 +12,12 @@ from erpnext.stock.report.stock_ageing.stock_ageing import get_fifo_queue, get_a
 from six import iteritems
 
 def execute(filters=None):
-	if not filters: filters = {}
-
+	# if not filters: filters = {}
+	if not filters: filters = {
+		"item_code":'20092',
+		"from_date":'2022-02-02',
+		"to_date":'2022-02-02'
+	}
 	validate_filters(filters)
 
 	columns = get_columns(filters)
@@ -29,27 +33,6 @@ def execute(filters=None):
 	item_balance = {}
 	item_value = {}
 
-
-	for (company, item, warehouse) in sorted(iwb_map):
-		if not item_map.get(item):  continue
-
-		row = []
-		qty_dict = iwb_map[(company, item, warehouse)]
-		item_balance.setdefault((item,item_map[item]["item_name"],item_map[item]["item_group"]), [])
-		total_stock_value = 0.00
-		for wh in warehouse_list:
-			res_qty = 0
-			row += [qty_dict.bal_qty] if wh.name == warehouse else [0.00]
-			res_qty = frappe.db.get_value('Bin',{'item_code': item, 'warehouse': wh.name}, 'reserved_qty')
-			if not res_qty:
-				res_qty = 0
-			row += [res_qty]
-			total_stock_value += qty_dict.bal_val if wh.name in warehouse else 0.00
-
-		item_balance[(item,item_map[item]["item_name"],item_map[item]["item_group"])].append(row)
-		item_value.setdefault((item,item_map[item]["item_name"],item_map[item]["item_group"]),[])
-		item_value[(item,item_map[item]["item_name"],item_map[item]["item_group"])].append(total_stock_value)
-
 	item_filters = ""
 
 	if filters.get("item_code") is not None and filters.get("item_code") != "":
@@ -59,22 +42,31 @@ def execute(filters=None):
 	if filters.get("warehouse") is not None and filters.get("warehouse") != "":
 		item_filters += """ and tb.warehouse = '{warehouse}' """.format(warehouse=filters.get("warehouse"))
 
-	bin_items = frappe.db.sql(""" select 
-										ti.item_code,
-										ti.item_name,
-										ti.item_group,
-										tb.warehouse,
-										tb.actual_qty,
-										tb.reserved_qty,
-										(tb.actual_qty - tb.reserved_qty) as available_qty,
-										tb.ordered_qty
-									from
-										`tabItem` ti
-									left join `tabBin` tb on
-										ti.item_code = tb.item_code
-									WHERE
-										tb.docstatus = 0 {item_filters}
-									""".format(item_filters=item_filters), as_dict=True)
+	for (company, item, warehouse) in sorted(iwb_map):
+		if not item_map.get(item):  continue
+		row = []
+		qty_dict = iwb_map[(company, item, warehouse)]
+		bin_list = frappe.get_list('Bin', filters={'item_code': item, 'warehouse': warehouse}, fields=['actual_qty','reserved_qty'])
+
+
+		item_balance.setdefault((item,item_map[item]["item_name"],item_map[item]["item_group"]), [])
+		total_stock_value = 0.00
+		for wh in warehouse_list:
+			res_qty = 0
+			avl_qty = 0
+			row += [qty_dict.bal_qty] if wh.name == warehouse else [0.00]
+			if bin_list:
+				row += [bin_list[0].reserved_qty] if wh.name == warehouse else [0.00]
+				row += [(bin_list[0].actual_qty)-(bin_list[0].reserved_qty)] if wh.name == warehouse else [0.00]
+			else:
+				row += [0.00]
+				row += [0.00]
+
+			total_stock_value += qty_dict.bal_val if wh.name in warehouse else 0.00
+
+		item_balance[(item,item_map[item]["item_name"],item_map[item]["item_group"])].append(row)
+		item_value.setdefault((item,item_map[item]["item_name"],item_map[item]["item_group"]),[])
+		item_value[(item,item_map[item]["item_name"],item_map[item]["item_group"])].append(total_stock_value)
 
 
 	# sum bal_qty by item
@@ -89,36 +81,46 @@ def execute(filters=None):
 		fifo_queue = item_ageing[item]["fifo_queue"]
 		average_age = 0.00
 		if fifo_queue:
-			average_age = get_average_age(fifo_queue, filters["to_date"])
+			average_age = get_average_age(fifo_queue, filters['to_date'])
 
 		row += [average_age]
 		item_doc = frappe.get_doc("Item",item)
 		row += [item_doc.bottles_per_crate]
 
-		for r in bin_items:
-			if r.item_code == item_doc.item_code:
-				reserv_qty += r.reserved_qty
-				avail_qty += r.available_qty
-		row += [reserv_qty]
-		row += [avail_qty]
-
+		res = [wh_balance[i] for i in range(len(wh_balance)) if i % 2 == 0]
 
 		bal_qty = [sum(bal_qty) for bal_qty in zip(*wh_balance)]
-		total_qty = sum(bal_qty)
+		bal_qty_split = [bal_qty[i:i + 3] for i in range(0, len(bal_qty), 3)]
+		actual = sum(list(map(float,[i[0] for i in bal_qty_split])))
+		reserv = sum(list(map(float,[i[1] for i in bal_qty_split])))
+		avail = sum(list(map(float,[i[2] for i in bal_qty_split])))
+
+		print("\nactual reserv avail",actual,reserv,avail)
+
+		row += [reserv]
+		row += [avail]
+
+		total_qty = actual
 		if len(warehouse_list) > 1:
-			row += [total_qty-reserv_qty]
+			print("warehouse len >1")
+			row += [actual]
+			# row += [800.00]
+			print("row",row)
 			if total_qty == 0:
 				row += [total_qty]
 			else:
 				row += [total_stock_value/total_qty]
 			row += [total_stock_value]
-
+		print("rowwww\n",row)
 		row += bal_qty
 		if total_qty > 0:
 			data.append(row)
 		elif not filters.get("filter_total_zero_qty"):
 			data.append(row)
+
+	print("\ndataaaa",data)
 	add_warehouse_column(columns, warehouse_list)
+	print("\nfinaldataaaa",data)
 	return columns, data
 
 def get_columns(filters):
@@ -128,7 +130,6 @@ def get_columns(filters):
 		_("Item")+":Link/Item:120",
 		_("Item Name")+"::170",
 		_("Item Group")+"::110",
-		# _("Total Value")+"::110",
 		_("Age")+":Float:80",
 		_("No of Bottles")+":Float:80",
 		_("Reserved Qty")+":Float:80",
@@ -163,10 +164,11 @@ def get_warehouse_list(filters):
 
 def add_warehouse_column(columns, warehouse_list):
 	if len(warehouse_list) > 1:
-		columns += [_("Total Qty")+":Int:100"]
+		columns += [_("Total Qty")+":Float:100"]
 		columns += [_("Per case value")+":Float:110"]
 		columns += [_("Total Value")+":Float:110"]
 
 	for wh in warehouse_list:
-		columns += [_(wh.name)+":Int:140"]
-		columns += [_(wh.name)+"\nReserved Qty"+":Int:200"]
+		columns += [_(wh.name)+":Float:140"]
+		columns += [_(wh.name)+"\nReserved Qty"+":Float:200"]
+		columns += [_(wh.name)+"\nAvailable Qty"+":Float:200"]
