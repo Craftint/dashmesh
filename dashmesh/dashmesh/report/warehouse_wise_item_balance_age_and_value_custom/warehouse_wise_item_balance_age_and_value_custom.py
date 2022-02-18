@@ -91,7 +91,6 @@ def execute(filters=None):
 		reserv = sum(list(map(float,[i[1] for i in bal_qty_split])))
 		avail = sum(list(map(float,[i[2] for i in bal_qty_split])))
 
-
 		total_qty = actual
 		if len(warehouse_list) > 1:
 			row += [reserv]
