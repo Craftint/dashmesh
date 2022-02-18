@@ -12,12 +12,8 @@ from erpnext.stock.report.stock_ageing.stock_ageing import get_fifo_queue, get_a
 from six import iteritems
 
 def execute(filters=None):
-	# if not filters: filters = {}
-	if not filters: filters = {
-		"item_code":'20092',
-		"from_date":'2022-02-02',
-		"to_date":'2022-02-02'
-	}
+	if not filters: filters = {}
+	
 	validate_filters(filters)
 
 	columns = get_columns(filters)
