@@ -175,7 +175,7 @@ def get_data(filters):
 		if item.base_rate != 0:
 			margin = round(flt(((item.base_rate - val_rate[0][0])/item.base_rate))*100,3)
 		else:
-			margin = round((item.base_rate - item.val_rate[0][0]),3)
+			margin = round((item.base_rate - val_rate[0][0]),3)
 
 		row = {
 			"item_code":item.item_code,
