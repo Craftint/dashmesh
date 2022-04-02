@@ -51,6 +51,7 @@ def execute(filters=None):
 			res_qty = 0
 			avl_qty = 0
 			row += [qty_dict.bal_qty] if wh.name == warehouse else [0.00]
+			total_stock_value += qty_dict.bal_val if wh.name == warehouse else 0.00
 			if bin_list:
 				row += [bin_list[0].reserved_qty] if wh.name == warehouse else [0.00]
 				row += [(bin_list[0].actual_qty)-(bin_list[0].reserved_qty)] if wh.name == warehouse else [0.00]
@@ -58,7 +59,6 @@ def execute(filters=None):
 				row += [0.00]
 				row += [0.00]
 
-			total_stock_value += qty_dict.bal_val if wh.name in warehouse else 0.00
 
 		item_balance[(item,item_map[item]["item_name"],item_map[item]["item_group"])].append(row)
 		item_value.setdefault((item,item_map[item]["item_name"],item_map[item]["item_group"]),[])
