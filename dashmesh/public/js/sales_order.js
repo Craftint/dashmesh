@@ -1,9 +1,11 @@
 frappe.ui.form.on('Sales Order','onload',function(frm){
-	frappe.db.get_value('Quotation',{name:cur_frm.doc.items[0].prevdoc_docname},
-	'warehouse',function(data){
-		console.log(data.warehouse)
-		cur_frm.set_value("set_warehouse",data.warehouse)
-	})
+	if(cur_frm.doc.docstatus == 0 && cur_frm.doc.__islocal== 1 && cur_frm.doc.items[0].prevdoc_docname){
+		frappe.db.get_value('Quotation',{name:cur_frm.doc.items[0].prevdoc_docname},
+		'warehouse',function(data){
+			console.log(data.warehouse)
+			cur_frm.set_value("set_warehouse",data.warehouse)
+		})
+	}
 })
 frappe.ui.form.on('Sales Order Item', {
 	qty:function(frm,cdt,cdn){
