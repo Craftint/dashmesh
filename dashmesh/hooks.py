@@ -23,7 +23,7 @@ fixtures = [
 					'Purchase Order Item-git_qty','Purchase Receipt Item-transit_qty','Purchase Order Item-dispatched_qty',
 					'Purchase Order-goods_status','Purchase Receipt Item-goods_in_transit_note','Purchase Receipt Item-goods_in_transit_note_item',
 					'Sales Order Item-profit_margin','Sales Order-net_profit_margin','Item-bottles_per_crate','Item-volume',
-					'Packing Slip-total_volume','Packing Slip Item-volume','Quotation Item-profit_margin','Quotation Item-gross_profit',
+					'Packing Slip-total_volume','Packing Slip Item-volume','Quotation Item-profit_margin',
 					'Quotation-net_profit_margin','Purchase Receipt Item-batch_expiry','Purchase Receipt Item-batch_number',
 					'Quotation Item-gross_profit_based_on_last_purchase_rate','Sales Order Item-gross_profit_based_on_last_purchase_rate','Quotation Item-last_purchase_rate',
 					'Sales Order Item-last_purchase_rate','Quotation-warehouse'
