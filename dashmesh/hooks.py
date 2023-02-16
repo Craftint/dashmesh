@@ -29,7 +29,7 @@ fixtures = [
 					'Sales Order Item-last_purchase_rate','Quotation-warehouse'
 				]
 			]
-		]
+		] 
 	},
 	{
 		"dt":"Property Setter",
