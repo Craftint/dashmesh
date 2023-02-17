@@ -8,7 +8,7 @@ from frappe import _
 from frappe.utils import flt, cint, getdate
 from erpnext.stock.report.stock_balance.stock_balance import (get_item_details,
 	get_item_reorder_details, get_item_warehouse_map, get_items, get_stock_ledger_entries)
-from erpnext.stock.report.stock_ageing.stock_ageing import get_fifo_queue, get_average_age
+from erpnext.stock.report.stock_ageing.stock_ageing import FIFOSlots, get_average_age
 from six import iteritems
 
 def execute(filters=None):
@@ -24,7 +24,7 @@ def execute(filters=None):
 	item_map = get_item_details(items, sle, filters)
 	iwb_map = get_item_warehouse_map(filters, sle)
 	warehouse_list = get_warehouse_list(filters)
-	item_ageing = get_fifo_queue(filters)
+	item_ageing = FIFOSlots(filters).generate()
 	data = []
 	item_balance = {}
 	item_value = {}
