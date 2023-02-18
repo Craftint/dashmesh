@@ -66,7 +66,10 @@ def check_reservation(doc,handler=None):
 					"warehouse": item.warehouse,
 		})
 		if db_exist:
-			item_bin = frappe.get_doc("Bin",db_exist[0][0])
+			#[0][0]
+			item_bin = frappe.get_doc("Bin",db_exist) #v14 code
+			# item_bin = frappe.get_doc("Bin",db_exist[0][0]) v12 code
+
 			available_qty = item_bin.actual_qty - item_bin.reserved_qty
 			if item.qty > available_qty:
 				if available_qty > 0:
