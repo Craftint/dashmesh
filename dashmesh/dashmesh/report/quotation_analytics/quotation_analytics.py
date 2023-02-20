@@ -131,7 +131,7 @@ def get_warehouse_list(filters):
 def get_data(filters):
 	data = []
 
-	quot_items = frappe.db.get_list("Quotation Item", {"parent": filters.get("quot")},['item_code','item_name','qty','base_rate','warehouse'])
+	quot_items = frappe.db.get_all("Quotation Item", {"parent": filters.get("quot")},['item_code','item_name','qty','base_rate','warehouse'])
 	customer = frappe.db.get_value('Quotation',{'name':filters.get('quot')},'customer_name')
 	warehouse_list = get_warehouse_list(filters)
 
