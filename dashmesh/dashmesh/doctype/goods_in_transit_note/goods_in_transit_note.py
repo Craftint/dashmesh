@@ -18,7 +18,7 @@ class GoodsInTransitNote(Document):
 	def checking_git(self):
 		for row in self.items:
 			git_qty = 0
-			records = frappe.db.get_list("Goods In Transit Item", { "purchase_order": row.purchase_order, "item_code": row.item_code ,'docstatus':['!=',2]}, ["qty"])
+			records = frappe.db.get_all("Goods In Transit Item", { "purchase_order": row.purchase_order, "item_code": row.item_code ,'docstatus':['!=',2]}, ["qty"])
 			for record in records:
 				git_qty += record.qty
 
