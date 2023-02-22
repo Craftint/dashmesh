@@ -13,20 +13,20 @@ frappe.ui.form.on("Purchase Order", {
 			args: {
 				name: frm.doc.name
 			},
-			callback: (r) => {
-				const content =
-					`<div class="document-link" data-doctype="Goods In Transit Note">
-					<a class="badge-link small" href="javascript:void(0)"
-					onclick="frappe.set_route('List', 'Goods In Transit Note', 'List', {'Goods In Transit Item.purchase_order':'`+frm.doc.name+`'});">
-						Goods In Transit Note
-					</a>
-					<span class="text-muted small count">`+
-					r.message +
-					`<span>
-				</div>`;
-				$(".document-link[data-doctype='Goods In Transit Note']").remove();
-				$(".form-dashboard-wrapper .form-links .transactions .form-documents").append(content);
-			},
+			// callback: (r) => {
+			// 	const content =
+			// 		`<div class="document-link" data-doctype="Goods In Transit Note">
+			// 		<a class="badge-link small" href="javascript:void(0)"
+			// 		onclick="frappe.set_route('List', 'Goods In Transit Note', 'List', {'Goods In Transit Item.purchase_order':'`+frm.doc.name+`'});">
+			// 			Goods In Transit Note
+			// 		</a>
+			// 		<span class="text-muted small count">`+
+			// 		r.message +
+			// 		`<span>
+			// 	</div>`;
+			// 	$(".document-link[data-doctype='Goods In Transit Note']").remove();
+			// 	$(".form-dashboard-wrapper .form-links .transactions .form-documents").append(content);
+			// },
 			error: (r) => {
 				// on error
 			}
