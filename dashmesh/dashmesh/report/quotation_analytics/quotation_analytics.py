@@ -148,7 +148,7 @@ def get_data(filters):
 
 		last_sold = frappe.db.sql(
 			"""select base_rate,posting_date from `tabSales Invoice Item` sid inner join `tabSales Invoice` si 
-			on sid.parent= si.name where sid.item_code = '{}' and si.customer_name = '{}' and si.docstatus != 2
+			on sid.parent= si.name where sid.item_code = "{}" and si.customer_name = "{}" and si.docstatus != 2
 			order by si.posting_date DESC""".format(
 				item.item_code, customer),as_dict=1)
 
@@ -162,7 +162,7 @@ def get_data(filters):
 
 		last_purchase = frappe.db.sql(
 			"""select base_rate,posting_date from `tabPurchase Invoice Item` sid inner join `tabPurchase Invoice` si 
-			on sid.parent= si.name where sid.item_code = '{}' and si.docstatus != 2 
+			on sid.parent= si.name where sid.item_code = "{}" and si.docstatus != 2 
 			order by si.posting_date DESC""".format(
 				item.item_code),as_dict=1)
 		if last_purchase:
