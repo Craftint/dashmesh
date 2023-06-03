@@ -8,23 +8,22 @@ from frappe import _
 from frappe.utils import flt, cint, getdate
 from frappe.query_builder.functions import Coalesce, CombineDatetime
 from erpnext.stock.doctype.inventory_dimension.inventory_dimension import get_inventory_dimensions
-from erpnext.stock.report.stock_balance.stock_balance import (get_item_warehouse_map,apply_conditions,
-			get_inventory_dimension_fields)
 from erpnext.stock.report.stock_ageing.stock_ageing import FIFOSlots, get_average_age
 from six import iteritems
 
+
+
+
 def execute(filters=None):
 	if not filters: filters = {}
-	
 	validate_filters(filters)
 
 	columns = get_columns(filters)
-
 	items = get_items(filters)
 	sle = get_stock_ledger_entries(filters, items)
 
 	item_map = get_item_details(items, sle, filters)
-	iwb_map = get_item_warehouse_map(filters, sle)
+	iwb_map = get_item_warehouse_map(filters,sle)
 	warehouse_list = get_warehouse_list(filters)
 	item_ageing = FIFOSlots(filters).generate()
 	data = []
@@ -260,3 +259,142 @@ def get_stock_ledger_entries(filters, items):
 
 	query = apply_conditions(query, filters)
 	return query.run(as_dict=True)
+
+
+def apply_conditions(query, filters):
+	sle = frappe.qb.DocType("Stock Ledger Entry")
+	warehouse_table = frappe.qb.DocType("Warehouse")
+
+	if not filters.get("from_date"):
+		frappe.throw(_("'From Date' is required"))
+
+	if to_date := filters.get("to_date"):
+		query = query.where(sle.posting_date <= to_date)
+	else:
+		frappe.throw(_("'To Date' is required"))
+
+	if company := filters.get("company"):
+		query = query.where(sle.company == company)
+
+	if filters.get("warehouse"):
+		query = apply_warehouse_filter(query, sle, filters)
+	elif warehouse_type := filters.get("warehouse_type"):
+		query = (
+			query.join(warehouse_table)
+			.on(warehouse_table.name == sle.warehouse)
+			.where(warehouse_table.warehouse_type == warehouse_type)
+		)
+
+	return query
+
+def get_inventory_dimension_fields():
+	return [dimension.fieldname for dimension in get_inventory_dimensions()]
+
+
+def get_item_warehouse_map(filters,sle):
+	iwb_map = {}
+	from_date = getdate(filters.get("from_date"))
+	to_date = getdate(filters.get("to_date"))
+	opening_vouchers = get_opening_vouchers(to_date)
+	float_precision = cint(frappe.db.get_default("float_precision")) or 3
+	inventory_dimensions = get_inventory_dimension_fields()
+
+	for d in sle:
+		group_by_key = get_group_by_key(d, filters, inventory_dimensions)
+		if group_by_key not in iwb_map:
+			iwb_map[group_by_key] = frappe._dict(
+				{
+					"opening_qty": 0.0,
+					"opening_val": 0.0,
+					"in_qty": 0.0,
+					"in_val": 0.0,
+					"out_qty": 0.0,
+					"out_val": 0.0,
+					"bal_qty": 0.0,
+					"bal_val": 0.0,
+					"val_rate": 0.0,
+				}
+			)
+
+		qty_dict = iwb_map[group_by_key]
+		for field in inventory_dimensions:
+			qty_dict[field] = d.get(field)
+
+		if d.voucher_type == "Stock Reconciliation" and not d.batch_no:
+			qty_diff = flt(d.qty_after_transaction) - flt(qty_dict.bal_qty)
+		else:
+			qty_diff = flt(d.actual_qty)
+
+		value_diff = flt(d.stock_value_difference)
+
+		if d.posting_date < from_date or d.voucher_no in opening_vouchers.get(d.voucher_type, []):
+			qty_dict.opening_qty += qty_diff
+			qty_dict.opening_val += value_diff
+
+		elif d.posting_date >= from_date and d.posting_date <= to_date:
+			if flt(qty_diff, float_precision) >= 0:
+				qty_dict.in_qty += qty_diff
+				qty_dict.in_val += value_diff
+			else:
+				qty_dict.out_qty += abs(qty_diff)
+				qty_dict.out_val += abs(value_diff)
+
+		qty_dict.val_rate = d.valuation_rate
+		qty_dict.bal_qty += qty_diff
+		qty_dict.bal_val += value_diff
+
+	iwb_map = filter_items_with_no_transactions(iwb_map, float_precision, inventory_dimensions)
+
+	return iwb_map
+
+
+def get_opening_vouchers(to_date):
+	opening_vouchers = {"Stock Entry": [], "Stock Reconciliation": []}
+
+	se = frappe.qb.DocType("Stock Entry")
+	sr = frappe.qb.DocType("Stock Reconciliation")
+
+	vouchers_data = (
+		frappe.qb.from_(
+			(
+				frappe.qb.from_(se)
+				.select(se.name, Coalesce("Stock Entry").as_("voucher_type"))
+				.where((se.docstatus == 1) & (se.posting_date <= to_date) & (se.is_opening == "Yes"))
+			)
+			+ (
+				frappe.qb.from_(sr)
+				.select(sr.name, Coalesce("Stock Reconciliation").as_("voucher_type"))
+				.where((sr.docstatus == 1) & (sr.posting_date <= to_date) & (sr.purpose == "Opening Stock"))
+			)
+		).select("voucher_type", "name")
+	).run(as_dict=True)
+
+	if vouchers_data:
+		for d in vouchers_data:
+			opening_vouchers[d.voucher_type].append(d.name)
+
+	return opening_vouchers
+
+
+def filter_items_with_no_transactions(iwb_map, float_precision: float, inventory_dimensions: list):
+	pop_keys = []
+	for group_by_key in iwb_map:
+		qty_dict = iwb_map[group_by_key]
+
+		no_transactions = True
+		for key, val in qty_dict.items():
+			if key in inventory_dimensions:
+				continue
+
+			val = flt(val, float_precision)
+			qty_dict[key] = val
+			if key != "val_rate" and val:
+				no_transactions = False
+
+		if no_transactions:
+			pop_keys.append(group_by_key)
+
+	for key in pop_keys:
+		iwb_map.pop(key)
+
+	return iwb_map
