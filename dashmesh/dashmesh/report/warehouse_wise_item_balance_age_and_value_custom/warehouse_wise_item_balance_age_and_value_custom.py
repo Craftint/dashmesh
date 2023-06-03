@@ -6,8 +6,10 @@ from __future__ import unicode_literals
 import frappe
 from frappe import _
 from frappe.utils import flt, cint, getdate
-from erpnext.stock.report.stock_balance.stock_balance import (get_item_details,
-	get_item_reorder_details, get_item_warehouse_map, get_items, get_stock_ledger_entries)
+from frappe.query_builder.functions import Coalesce, CombineDatetime
+from erpnext.stock.doctype.inventory_dimension.inventory_dimension import get_inventory_dimensions
+from erpnext.stock.report.stock_balance.stock_balance import (get_items,get_item_warehouse_map,
+			get_stock_ledger_entries)
 from erpnext.stock.report.stock_ageing.stock_ageing import FIFOSlots, get_average_age
 from six import iteritems
 
@@ -159,3 +161,47 @@ def add_warehouse_column(columns, warehouse_list):
 		columns += [_(wh.name)+":Float:140"]
 		columns += [_(wh.name)+"\nReserved Qty"+":Float:200"]
 		columns += [_(wh.name)+"\nAvailable Qty"+":Float:200"]
+
+
+def get_item_details(items, sle, filters):
+        item_details = {}
+        if not items:
+                items = list(set(d.item_code for d in sle))
+
+        if not items:
+                return item_details
+
+        item_table = frappe.qb.DocType("Item")
+
+        query = (
+                frappe.qb.from_(item_table)
+                .select(
+                        item_table.name,
+                        item_table.item_name,
+                        item_table.description,
+                        item_table.item_group,
+                        item_table.brand,
+                        item_table.stock_uom,
+                )
+                .where(item_table.name.isin(items))
+        )
+
+        if uom := filters.get("include_uom"):
+                uom_conv_detail = frappe.qb.DocType("UOM Conversion Detail")
+                query = (
+                        query.left_join(uom_conv_detail)
+                        .on((uom_conv_detail.parent == item_table.name) & (uom_conv_detail.uom == uom))
+                        .select(uom_conv_detail.conversion_factor)
+                )
+
+        result = query.run(as_dict=1)
+        for item_table in result:
+                item_details.setdefault(item_table.name, item_table)
+
+        if filters.get("show_variant_attributes"):
+                variant_values = get_variant_values_for(list(item_details))
+                item_details = {k: v.update(variant_values.get(k, {})) for k, v in item_details.items()}
+
+        return item_details
+
+
