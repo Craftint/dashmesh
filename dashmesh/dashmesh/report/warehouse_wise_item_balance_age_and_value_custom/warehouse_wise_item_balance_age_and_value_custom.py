@@ -8,8 +8,8 @@ from frappe import _
 from frappe.utils import flt, cint, getdate
 from frappe.query_builder.functions import Coalesce, CombineDatetime
 from erpnext.stock.doctype.inventory_dimension.inventory_dimension import get_inventory_dimensions
-from erpnext.stock.report.stock_balance.stock_balance import (get_items,get_item_warehouse_map,
-			get_stock_ledger_entries)
+from erpnext.stock.report.stock_balance.stock_balance import (get_item_warehouse_map,apply_conditions,
+			get_inventory_dimension_fields)
 from erpnext.stock.report.stock_ageing.stock_ageing import FIFOSlots, get_average_age
 from six import iteritems
 
@@ -205,3 +205,58 @@ def get_item_details(items, sle, filters):
         return item_details
 
 
+
+
+def get_items(filters):
+	"Get items based on item code, item group or brand."
+	if item_code := filters.get("item_code"):
+		return [item_code]
+	else:
+		item_filters = {}
+		if item_group := filters.get("item_group"):
+			children = get_descendants_of("Item Group", item_group, ignore_permissions=True)
+			item_filters["item_group"] = ("in", children + [item_group])
+		if brand := filters.get("brand"):
+			item_filters["brand"] = brand
+
+		return frappe.get_all("Item", filters=item_filters, pluck="name", order_by=None)
+
+
+
+def get_stock_ledger_entries(filters, items):
+	sle = frappe.qb.DocType("Stock Ledger Entry")
+	query = (
+		frappe.qb.from_(sle)
+		.select(
+			sle.item_code,
+			sle.warehouse,
+			sle.posting_date,
+			sle.actual_qty,
+			sle.valuation_rate,
+			sle.company,
+			sle.voucher_type,
+			sle.qty_after_transaction,
+			sle.stock_value_difference,
+			sle.item_code.as_("name"),
+			sle.voucher_no,
+			sle.stock_value,
+			sle.batch_no,
+		)
+		.where((sle.docstatus < 2) & (sle.is_cancelled == 0))
+		.orderby(CombineDatetime(sle.posting_date, sle.posting_time))
+		.orderby(sle.creation)
+		.orderby(sle.actual_qty)
+	)
+
+	inventory_dimension_fields = get_inventory_dimension_fields()
+	if inventory_dimension_fields:
+		for fieldname in inventory_dimension_fields:
+			query = query.select(fieldname)
+			if fieldname in filters and filters.get(fieldname):
+				query = query.where(sle[fieldname].isin(filters.get(fieldname)))
+
+	if items:
+		query = query.where(sle.item_code.isin(items))
+
+	query = apply_conditions(query, filters)
+	return query.run(as_dict=True)
