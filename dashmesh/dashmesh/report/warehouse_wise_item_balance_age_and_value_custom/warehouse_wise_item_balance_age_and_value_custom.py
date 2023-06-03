@@ -400,11 +400,11 @@ def filter_items_with_no_transactions(iwb_map, float_precision: float, inventory
 	return iwb_map
 
 
-def get_group_by_key(self, row) -> tuple:
-		group_by_key = [row.company, row.item_code, row.warehouse]
+def get_group_by_key(row, filters, inventory_dimension_fields) -> tuple:
+	group_by_key = [row.company, row.item_code, row.warehouse]
 
-		for fieldname in self.inventory_dimensions:
-			if self.filters.get(fieldname):
-				group_by_key.append(row.get(fieldname))
+	for fieldname in inventory_dimension_fields:
+		if filters.get(fieldname):
+			group_by_key.append(row.get(fieldname))
 
-		return tuple(group_by_key)
+	return tuple(group_by_key)
