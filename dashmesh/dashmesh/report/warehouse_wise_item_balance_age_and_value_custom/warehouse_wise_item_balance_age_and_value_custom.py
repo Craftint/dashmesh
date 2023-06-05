@@ -7,6 +7,7 @@ import frappe
 from frappe import _
 from frappe.utils import flt, cint, getdate
 from frappe.query_builder.functions import Coalesce, CombineDatetime
+from erpnext.stock.doctype.warehouse.warehouse import apply_warehouse_filter
 from erpnext.stock.doctype.inventory_dimension.inventory_dimension import get_inventory_dimensions
 from erpnext.stock.report.stock_ageing.stock_ageing import FIFOSlots, get_average_age
 from six import iteritems
